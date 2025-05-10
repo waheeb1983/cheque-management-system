@@ -68,6 +68,53 @@ const arabicPluralRules = {
     'مليار': 'مليارات',
 };
 
+// English number to words conversion
+const englishNumerals = {
+    // Singles
+    0: '',
+    1: 'one',
+    2: 'two',
+    3: 'three',
+    4: 'four',
+    5: 'five',
+    6: 'six',
+    7: 'seven',
+    8: 'eight',
+    9: 'nine',
+    10: 'ten',
+    11: 'eleven',
+    12: 'twelve',
+    13: 'thirteen',
+    14: 'fourteen',
+    15: 'fifteen',
+    16: 'sixteen',
+    17: 'seventeen',
+    18: 'eighteen',
+    19: 'nineteen',
+    
+    // Tens
+    20: 'twenty',
+    30: 'thirty',
+    40: 'forty',
+    50: 'fifty',
+    60: 'sixty',
+    70: 'seventy',
+    80: 'eighty',
+    90: 'ninety',
+    
+    // Hundreds
+    100: 'hundred',
+    
+    // Thousands
+    1000: 'thousand',
+    
+    // Millions
+    1000000: 'million',
+    
+    // Billions
+    1000000000: 'billion'
+};
+
 /**
  * Convert a number to Arabic words
  * @param {number} num - The number to convert
@@ -245,57 +292,216 @@ function convertLessThanThousand(num) {
 }
 
 /**
+ * Convert a number to English words
+ * @param {number} num - The number to convert
+ * @returns {string} The number in English words
+ */
+function num2wordsEnglish(num) {
+    if (num === 0) return 'zero';
+    
+    let result = '';
+    
+    // Handle negative numbers
+    if (num < 0) {
+        result = 'negative ';
+        num = Math.abs(num);
+    }
+    
+    // Handle decimals
+    let decimalPart = '';
+    if (num % 1 !== 0) {
+        const parts = num.toString().split('.');
+        num = parseInt(parts[0]);
+        decimalPart = parts[1];
+    }
+    
+    // Convert whole number
+    const integerPart = convertWholeNumberEnglish(num);
+    result += integerPart;
+    
+    // Add decimal part if exists
+    if (decimalPart) {
+        result += ' point ';
+        for (const digit of decimalPart) {
+            result += englishNumerals[parseInt(digit)] + ' ';
+        }
+    }
+    
+    return result.trim();
+}
+
+/**
+ * Convert a whole number to English words
+ * @param {number} num - The whole number to convert
+ * @returns {string} The number in English words
+ */
+function convertWholeNumberEnglish(num) {
+    if (num === 0) return '';
+    
+    // Direct lookup for numbers in the dictionary
+    if (num < 20) {
+        return englishNumerals[num];
+    }
+    
+    let result = '';
+    
+    // Handle billions
+    if (num >= 1000000000) {
+        const billions = Math.floor(num / 1000000000);
+        result += convertWholeNumberEnglish(billions) + ' billion ';
+        num %= 1000000000;
+    }
+    
+    // Handle millions
+    if (num >= 1000000) {
+        const millions = Math.floor(num / 1000000);
+        result += convertWholeNumberEnglish(millions) + ' million ';
+        num %= 1000000;
+    }
+    
+    // Handle thousands
+    if (num >= 1000) {
+        const thousands = Math.floor(num / 1000);
+        result += convertWholeNumberEnglish(thousands) + ' thousand ';
+        num %= 1000;
+    }
+    
+    // Handle hundreds
+    if (num >= 100) {
+        const hundreds = Math.floor(num / 100);
+        result += englishNumerals[hundreds] + ' hundred ';
+        num %= 100;
+    }
+    
+    // Handle tens and units
+    if (num > 0) {
+        if (result !== '') {
+            result += 'and ';
+        }
+        
+        if (num < 20) {
+            result += englishNumerals[num];
+        } else {
+            const tens = Math.floor(num / 10) * 10;
+            const units = num % 10;
+            result += englishNumerals[tens];
+            if (units > 0) {
+                result += '-' + englishNumerals[units];
+            }
+        }
+    }
+    
+    return result.trim();
+}
+
+/**
  * Format the amount in words for a cheque
  * @param {number} dinars - The dinars amount
  * @param {number} piasters - The piasters amount
- * @param {string} currency - The currency code (default: 'JOD')
+ * @param {string} currency - The currency code
  * @returns {string} The formatted amount in words
  */
 function convertAmountToWords(dinars, piasters, currency = 'JOD') {
-    // Convert dinars to words
-    const dinarsWords = num2words(dinars);
+    let result = '';
     
-    // Define currency words and their plural forms
-    const currencyWords = {
-        // Dinars
-        'JOD': { singular: 'دينار', plural: 'دنانير', subunit: 'فلس', subunitPlural: 'فلسات' },
-        'DZD': { singular: 'دينار', plural: 'دنانير', subunit: 'سنتيم', subunitPlural: 'سنتيمات' },
-        'BHD': { singular: 'دينار', plural: 'دنانير', subunit: 'فلس', subunitPlural: 'فلسات' },
-        'IQD': { singular: 'دينار', plural: 'دنانير', subunit: 'فلس', subunitPlural: 'فلسات' },
-        'KWD': { singular: 'دينار', plural: 'دنانير', subunit: 'فلس', subunitPlural: 'فلسات' },
-        'LYD': { singular: 'دينار', plural: 'دنانير', subunit: 'درهم', subunitPlural: 'دراهم' },
-        'TND': { singular: 'دينار', plural: 'دنانير', subunit: 'مليم', subunitPlural: 'مليمات' },
-        
-        // Pounds
-        'EGP': { singular: 'جنيه', plural: 'جنيهات', subunit: 'قرش', subunitPlural: 'قروش' },
-        'LBP': { singular: 'ليرة', plural: 'ليرات', subunit: 'قرش', subunitPlural: 'قروش' },
-        'SYP': { singular: 'ليرة', plural: 'ليرات', subunit: 'قرش', subunitPlural: 'قروش' },
-        
-        // Rials
-        'OMR': { singular: 'ريال', plural: 'ريالات', subunit: 'بيسة', subunitPlural: 'بيسات' },
-        'QAR': { singular: 'ريال', plural: 'ريالات', subunit: 'درهم', subunitPlural: 'دراهم' },
-        'SAR': { singular: 'ريال', plural: 'ريالات', subunit: 'هللة', subunitPlural: 'هللات' },
-        'YER': { singular: 'ريال', plural: 'ريالات', subunit: 'فلس', subunitPlural: 'فلسات' },
-        
-        // Dirhams
-        'MAD': { singular: 'درهم', plural: 'دراهم', subunit: 'سنتيم', subunitPlural: 'سنتيمات' },
-        'AED': { singular: 'درهم', plural: 'دراهم', subunit: 'فلس', subunitPlural: 'فلسات' },
-        
-        // Others
-        'MRU': { singular: 'أوقية', plural: 'أوقيات', subunit: 'خمس', subunitPlural: 'أخماس' }
-    };
+    // Define currencies that use فلس/فلسات
+    const filCurrencyCodes = ['JOD', 'BHD', 'IQD', 'KWD', 'AED', 'YER'];
     
-    // Get currency info
-    const currencyInfo = currencyWords[currency] || currencyWords['JOD'];
-    
-    // Determine the appropriate currency word form
-    let currencyWord = dinars >= 3 && dinars <= 10 ? currencyInfo.plural : currencyInfo.singular;
-    
-    // Format full text
-    if (piasters) {
-        const subunitWord = piasters >= 3 && piasters <= 10 ? currencyInfo.subunitPlural : currencyInfo.subunit;
-        return `${dinarsWords} ${currencyWord} و ${piasters} ${subunitWord} فقط لا غير`;
+    // Handle piasters based on currency type
+    let finalPiasters = piasters || 0;
+    if (filCurrencyCodes.includes(currency)) {
+        // For فلس currencies, keep 3 digits
+        finalPiasters = finalPiasters.toString().padStart(3, '0');
     } else {
-        return `${dinarsWords} ${currencyWord} فقط لا غير`;
+        // For non-فلس currencies, keep 2 digits
+        finalPiasters = finalPiasters.toString().padStart(2, '0');
     }
+    
+    if (currency === 'USD') {
+        // English conversion for USD
+        let amountInWords = num2wordsEnglish(dinars);
+        
+        // Add "and" between hundreds and tens if needed
+        if (dinars >= 100 && dinars % 100 !== 0) {
+            amountInWords = amountInWords.replace(/(\d+) hundred (\d+)/, '$1 hundred and $2');
+        }
+        
+        result = amountInWords + ' dollars';
+        
+        // Format cents as XX/100, always two digits
+        const cents = finalPiasters.toString().padStart(2, '0');
+        result += ' and ' + cents + '/100';
+        
+        // Add "only" at the end
+        result += ' only';
+    } else {
+        // Arabic conversion for other currencies
+        result = num2words(dinars) + ' ' + getCurrencyName(currency);
+        if (finalPiasters > 0) {
+            // For non-USD currencies, show decimal part as numbers
+            result += ' و ' + finalPiasters + ' ' + getCurrencyFractionName(currency);
+        }
+        // Add "فقط لا غير" at the end
+        result += ' فقط لا غير';
+    }
+    
+    return result;
+}
+
+/**
+ * Get the currency name in Arabic
+ * @param {string} currency - The currency code
+ * @returns {string} The currency name in Arabic
+ */
+function getCurrencyName(currency) {
+    const currencyNames = {
+        'JOD': 'دينار أردني',
+        'BHD': 'دينار بحريني',
+        'IQD': 'دينار عراقي',
+        'KWD': 'دينار كويتي',
+        'AED': 'درهم إماراتي',
+        'YER': 'ريال يمني',
+        'SAR': 'ريال سعودي',
+        'QAR': 'ريال قطري',
+        'OMR': 'ريال عماني',
+        'EGP': 'جنيه مصري',
+        'DZD': 'دينار جزائري',
+        'LBP': 'ليرة لبنانية',
+        'LYD': 'دينار ليبي',
+        'MRU': 'أوقية موريتانية',
+        'MAD': 'درهم مغربي',
+        'SYP': 'ليرة سورية',
+        'TND': 'دينار تونسي',
+        'USD': 'دولار أمريكي'
+    };
+    return currencyNames[currency] || 'دينار';
+}
+
+/**
+ * Get the currency fraction name in Arabic
+ * @param {string} currency - The currency code
+ * @returns {string} The currency fraction name in Arabic
+ */
+function getCurrencyFractionName(currency) {
+    const fractionNames = {
+        'JOD': 'فلس',
+        'BHD': 'فلس',
+        'IQD': 'فلس',
+        'KWD': 'فلس',
+        'AED': 'فلس',
+        'YER': 'فلس',
+        'SAR': 'هللة',
+        'QAR': 'درهم',
+        'OMR': 'بيسة',
+        'EGP': 'قرش',
+        'DZD': 'سنتيم',
+        'LBP': 'قرش',
+        'LYD': 'درهم',
+        'MRU': 'خمس',
+        'MAD': 'سنتيم',
+        'SYP': 'قرش',
+        'TND': 'مليم',
+        'USD': 'سنت'
+    };
+    return fractionNames[currency] || 'فلس';
 } 
