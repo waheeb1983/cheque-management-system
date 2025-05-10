@@ -64,7 +64,12 @@ function initializeModals() {
     const confirmModal = document.getElementById('confirmModal');
     if (confirmModal) {
         const confirmDeleteBtn = confirmModal.querySelector('#confirmDeleteBtn');
-        if (confirmDeleteBtn) confirmDeleteBtn.addEventListener('click', handleConfirmDelete);
+        if (confirmDeleteBtn) {
+            confirmDeleteBtn.addEventListener('click', function() {
+                const modal = bootstrap.Modal.getInstance(confirmModal);
+                modal.hide();
+            });
+        }
     }
 }
 
