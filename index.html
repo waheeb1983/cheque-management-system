@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cheque Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+    <style>
+        /* Additional styles for new pages */
+        .page-section {
+            display: none;
+            padding: 20px;
+        }
+        .page-section.active {
+            display: block;
+        }
+        .nav-link {
+            color: white !important;
+            margin: 0 10px;
+        }
+        .nav-link.active {
+            font-weight: bold;
+        }
+        .contact-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        @media (max-width: 768px) {
+            .navbar-nav {
+                margin-top: 10px;
+            }
+            .nav-link {
+                margin: 5px 0;
+            }
+        }
+    </style>
+    <script>
+        // Always keep LTR layout
+        document.documentElement.dir = 'ltr';
+    </script>
+  
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3142547785727384"
+     crossorigin="anonymous"></script>
+<!-- bigads -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:900px;height:90px"
+     data-ad-client="ca-pub-3142547785727384"
+     data-ad-slot="4872073758"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+  
+  
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-bank"></i> Cheque Management System
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-page="home" data-i18n="home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="about" data-i18n="about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="contact" data-i18n="contact">Contact</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-danger btn-sm me-2" id="clearAllData">
+                        <i class="bi bi-trash"></i> <span data-i18n="clear_all">Clear All Data</span>
+                    </button>
+                    <select class="form-select form-select-sm" id="languageSelector">
+                        <option value="en">English</option>
+                        <option value="ar">العربية</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Home Page -->
+        <div id="homePage" class="page-section active">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="bi bi-plus-circle"></i> <span data-i18n="new_cheque">New Cheque</span>
+                        </div>
+                        <div class="card-body">
+                            <form id="chequeForm">
+                                <div class="mb-3">
+                                    <label for="recipient" class="form-label" data-i18n="recipient">لأمر:</label>
+                                    <input type="text" class="form-control" id="recipient" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="currency" class="form-label" data-i18n="currency">العملة:</label>
+                                    <select class="form-select" id="currency" required>
+                                        <option value="USD">USA Dollar</option>
+                                        <option value="JOD">دينار أردني</option>
+                                        <option value="EGP">جنيه مصري</option>
+                                        <option value="DZD">دينار جزائري</option>
+                                        <option value="BHD">دينار بحريني</option>
+                                        <option value="IQD">دينار عراقي</option>
+                                        <option value="KWD">دينار كويتي</option>
+                                        <option value="LBP">ليرة لبنانية</option>
+                                        <option value="LYD">دينار ليبي</option>
+                                        <option value="MRU">أوقية موريتانية</option>
+                                        <option value="MAD">درهم مغربي</option>
+                                        <option value="OMR">ريال عماني</option>
+                                        <option value="QAR">ريال قطري</option>
+                                        <option value="SAR">ريال سعودي</option>
+                                        <option value="SYP">ليرة سورية</option>
+                                        <option value="TND">دينار تونسي</option>
+                                        <option value="AED">درهم إماراتي</option>
+                                        <option value="YER">ريال يمني</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="amount" data-i18n="amount">المبلغ</label>
+                                    <input type="text" class="form-control" id="amount" required>
+                                    <small class="form-text text-muted" id="amountPlaceholder"></small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="date" class="form-label" data-i18n="cheque_date">تاريخ الشيك:</label>
+                                    <input type="date" class="form-control" id="date" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="cheque_number" class="form-label" data-i18n="cheque_number">Cheque Number:</label>
+                                    <input type="text" class="form-control" id="cheque_number">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="bank_name" class="form-label" data-i18n="bank_name">Bank Name:</label>
+                                    <input type="text" class="form-control" id="bank_name">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="account_number" class="form-label" data-i18n="account_number">Account Number:</label>
+                                    <input type="text" class="form-control" id="account_number">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="notes" class="form-label" data-i18n="notes">Notes:</label>
+                                    <textarea class="form-control" id="notes" rows="3"></textarea>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-save"></i> <span data-i18n="save_cheque">Save Cheque</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-9">
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-list-check"></i> <span data-i18n="cheque_list">Cheque List</span></span>
+                            <div class="search-box">
+                                <i class="bi bi-search"></i>
+                                <input type="text" id="searchInput" class="form-control form-control-sm" data-i18n-placeholder="search" placeholder="Search...">
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive" style="max-height: 70vh; overflow-y: auto;">
+                                <table class="table table-hover table-sm" id="chequeTable">
+                                    <thead class="sticky-top bg-white">
+                                        <tr>
+                                            <th style="min-width: 150px;" data-i18n="recipient">Recipient</th>
+                                            <th style="min-width: 120px;" data-i18n="amount">Amount</th>
+                                            <th style="min-width: 100px;" data-i18n="cheque_date">Cheque Date</th>
+                                            <th style="min-width: 100px;" data-i18n="status">Status</th>
+                                            <th style="min-width: 150px;" data-i18n="actions">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="chequeTableBody">
+                                        <!-- Cheques will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Page -->
+        <div id="aboutPage" class="page-section">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title mb-4" data-i18n="about_title">About Us</h2>
+                    <p class="card-text" data-i18n="about_content">
+                        Welcome to our Cheque Management System. We provide a comprehensive solution for managing and tracking cheques efficiently. Our system helps you organize, print, and monitor your cheques with ease.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Page -->
+        <div id="contactPage" class="page-section">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title mb-4" data-i18n="contact_title">Contact Us</h2>
+                    <div class="contact-info">
+                        <p class="mb-2" data-i18n="contact_email_label">Email us at:</p>
+                        <a href="mailto:waheebnidami@gmail.com" class="btn btn-outline-primary">
+                            <i class="bi bi-envelope"></i> waheebnidami@gmail.com
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="previewModalLabel" data-i18n="preview">Cheque Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="preview-wrapper">
+                        <div class="preview-section">
+                            <div class="preview-container">
+                                <canvas id="chequeCanvas" width="3508" height="2480"></canvas>
+                            </div>
+                        </div>
+                        <div class="controls-section">
+                            <div class="position-controls">
+                                <h5 data-i18n="adjust_positions">Adjust Positions</h5>
+                                
+                                <!-- Recipient Group -->
+                                <div class="position-group mb-3 p-3 border rounded">
+                                    <h6 class="mb-3" data-i18n="recipient">Recipient</h6>
+                                    <div class="slider-container">
+                                        <span class="slider-label" data-i18n="recipient_x">Recipient X:</span>
+                                        <input type="range" class="form-range position-slider" min="0" max="3508" id="recipient_x">
+                                        <span class="slider-value" id="recipient_x_value">2400</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <span class="slider-label" data-i18n="recipient_y">Recipient Y:</span>
+                                        <input type="range" class="form-range position-slider" min="0" max="2480" id="recipient_y">
+                                        <span class="slider-value" id="recipient_y_value">1080</span>
+                                    </div>
+                                </div>
+
+                                <!-- Amount Words Group -->
+                                <div class="position-group mb-3 p-3 border rounded">
+                                    <h6 class="mb-3" data-i18n="amount_words">Amount Words</h6>
+                                    <div class="slider-container">
+                                        <span class="slider-label" data-i18n="amount_words_x">Amount Words X:</span>
+                                        <input type="range" class="form-range position-slider" min="0" max="3508" id="amount_words_x">
+                                        <span class="slider-value" id="amount_words_x_value">1850</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <span class="slider-label" data-i18n="amount_words_y">Amount Words Y:</span>
+                                        <input type="range" class="form-range position-slider" min="0" max="2480" id="amount_words_y">
+                                        <span class="slider-value" id="amount_words_y_value">1170</span>
+                                    </div>
+                                </div>
+
+                                <!-- Amount Number Group -->
+                                <div class="position-group mb-3 p-3 border rounded">
+                                    <h6 class="mb-3" data-i18n="amount_num">Amount Number</h6>
+                                    <div class="slider-container">
+                                        <span class="slider-label" data-i18n="amount_num_x">Amount Num X:</span>
+                                        <input type="range" class="form-range position-slider" min="0" max="3508" id="amount_num_x">
+                                        <span class="slider-value" id="amount_num_x_value">3100</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <span class="slider-label" data-i18n="amount_num_y">Amount Num Y:</span>
+                                        <input type="range" class="form-range position-slider" min="0" max="2480" id="amount_num_y">
+                                        <span class="slider-value" id="amount_num_y_value">1250</span>
+                                    </div>
+                                </div>
+
+                                <!-- Piasters Group -->
+                                <div class="position-group mb-3 p-3 border rounded">
+                                    <h6 class="mb-3" data-i18n="piasters">Piasters</h6>
+                                    <div class="slider-container">
+                                        <span class="slider-label" data-i18n="piasters_x">Piasters X:</span>
+                                        <input type="range" class="form-range position-slider" min="0" max="3508" id="piasters_num_x">
+                                        <span class="slider-value" id="piasters_num_x_value">3300</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <span class="slider-label" data-i18n="piasters_y">Piasters Y:</span>
+                                        <input type="range" class="form-range position-slider" min="0" max="2480" id="piasters_num_y">
+                                        <span class="slider-value" id="piasters_num_y_value">1250</span>
+                                    </div>
+                                </div>
+
+                                <!-- Date Group -->
+                                <div class="position-group mb-3 p-3 border rounded">
+                                    <h6 class="mb-3" data-i18n="date">Date</h6>
+                                    <div class="slider-container">
+                                        <span class="slider-label" data-i18n="date_x">Date X:</span>
+                                        <input type="range" class="form-range position-slider" min="0" max="3508" id="date_x">
+                                        <span class="slider-value" id="date_x_value">1650</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <span class="slider-label" data-i18n="date_y">Date Y:</span>
+                                        <input type="range" class="form-range position-slider" min="0" max="2480" id="date_y">
+                                        <span class="slider-value" id="date_y_value">930</span>
+                                    </div>
+                                </div>
+                                
+                                <hr class="my-3">
+                                
+                                <h5 data-i18n="font_sizes">Font Sizes</h5>
+                                <div class="slider-container">
+                                    <span class="slider-label" data-i18n="recipient_font">Recipient:</span>
+                                    <input type="range" class="form-range font-slider" min="20" max="100" value="60" id="recipient_font_size">
+                                    <span class="slider-value" id="recipient_font_size_value">60</span>
+                                </div>
+                                <div class="slider-container">
+                                    <span class="slider-label" data-i18n="amount_words_font">Amount Words:</span>
+                                    <input type="range" class="form-range font-slider" min="20" max="100" value="60" id="amount_words_font_size">
+                                    <span class="slider-value" id="amount_words_font_size_value">60</span>
+                                </div>
+                                <div class="slider-container">
+                                    <span class="slider-label" data-i18n="amount_num_font">Amount Num:</span>
+                                    <input type="range" class="form-range font-slider" min="20" max="100" value="50" id="amount_num_font_size">
+                                    <span class="slider-value" id="amount_num_font_size_value">50</span>
+                                </div>
+                                <div class="slider-container">
+                                    <span class="slider-label" data-i18n="date_font">Date:</span>
+                                    <input type="range" class="form-range font-slider" min="20" max="100" value="50" id="date_font_size">
+                                    <span class="slider-value" id="date_font_size_value">50</span>
+                                </div>
+                                
+                                <hr class="my-3">
+                                
+                                <h5 data-i18n="position_profiles">Position Profiles</h5>
+                                <div class="d-flex mb-3">
+                                    <select class="form-select me-2" id="profileSelector">
+                                        <option value="" data-i18n="select_profile">Select a profile</option>
+                                        <!-- Profiles will be loaded here -->
+                                    </select>
+                                    <button type="button" class="btn btn-sm btn-primary" id="loadProfile" data-i18n="load">Load</button>
+                                </div>
+                                <div class="input-group mb-3">
+                                    <input type="text" class="form-control" id="profileName" data-i18n-placeholder="save_profile" placeholder="Profile name">
+                                    <button class="btn btn-outline-primary" type="button" id="saveProfileBtn" data-i18n="save_profile">Save Profile</button>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-danger mb-2" id="deleteProfileBtn" data-i18n="delete_profile">Delete Selected Profile</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="close">Close</button>
+                    <button type="button" class="btn btn-primary" id="printCheque" data-i18n="print_cheque">Print Cheque</button>
+                    <button type="button" class="btn btn-success" id="savePositions" data-i18n="save_positions">Save Positions</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel" data-i18n="edit_cheque">Edit Cheque</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm">
+                        <input type="hidden" id="edit_id">
+                        <div class="mb-3">
+                            <label for="edit_recipient" class="form-label" data-i18n="recipient">لأمر:</label>
+                            <input type="text" class="form-control" id="edit_recipient" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="edit_currency" class="form-label" data-i18n="currency">العملة:</label>
+                            <select class="form-select" id="edit_currency" required>
+                                <option value="USD">USA Dollar</option>
+                                <option value="JOD">دينار أردني</option>
+                                <option value="EGP">جنيه مصري</option>
+                                <option value="DZD">دينار جزائري</option>
+                                <option value="BHD">دينار بحريني</option>
+                                <option value="IQD">دينار عراقي</option>
+                                <option value="KWD">دينار كويتي</option>
+                                <option value="LBP">ليرة لبنانية</option>
+                                <option value="LYD">دينار ليبي</option>
+                                <option value="MRU">أوقية موريتانية</option>
+                                <option value="MAD">درهم مغربي</option>
+                                <option value="OMR">ريال عماني</option>
+                                <option value="QAR">ريال قطري</option>
+                                <option value="SAR">ريال سعودي</option>
+                                <option value="SYP">ليرة سورية</option>
+                                <option value="TND">دينار تونسي</option>
+                                <option value="AED">درهم إماراتي</option>
+                                <option value="YER">ريال يمني</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="edit_amount" class="form-label" data-i18n="amount">المبلغ:</label>
+                            <input type="text" class="form-control" id="edit_amount" required>
+                            <small class="form-text text-muted" id="editAmountPlaceholder"></small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="edit_date" class="form-label" data-i18n="cheque_date">تاريخ الشيك:</label>
+                            <input type="date" class="form-control" id="edit_date" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit_cheque_number" class="form-label" data-i18n="cheque_number">Cheque Number:</label>
+                            <input type="text" class="form-control" id="edit_cheque_number">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit_bank_name" class="form-label" data-i18n="bank_name">Bank Name:</label>
+                            <input type="text" class="form-control" id="edit_bank_name">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit_account_number" class="form-label" data-i18n="account_number">Account Number:</label>
+                            <input type="text" class="form-control" id="edit_account_number">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit_notes" class="form-label" data-i18n="notes">Notes:</label>
+                            <textarea class="form-control" id="edit_notes" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit_status" class="form-label" data-i18n="status">Status:</label>
+                            <select class="form-select" id="edit_status">
+                                <option value="pending">Pending</option>
+                                <option value="printed">Printed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="cancel">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveEditBtn" data-i18n="save_changes">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel" data-i18n="confirm_delete">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" data-i18n="delete_confirmation">
+                    Are you sure you want to delete this cheque? This action cannot be undone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="cancel">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn" data-i18n="delete">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="infoModalLabel" data-i18n="cheque_details">Cheque Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="fw-bold" data-i18n="cheque_number">Cheque Number:</label>
+                        <p id="info_cheque_number">-</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="fw-bold" data-i18n="bank_name">Bank Name:</label>
+                        <p id="info_bank_name">-</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="fw-bold" data-i18n="account_number">Account Number:</label>
+                        <p id="info_account_number">-</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="fw-bold" data-i18n="notes">Notes:</label>
+                        <p id="info_notes">-</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="close">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/arabic-reshaper@3.0.0/build/arabic-reshaper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bidi-js@1.0.2/dist/bidi.min.js"></script>
+    <script src="./numerals.js"></script>
+    <script src="./translations.js"></script>
+    <script src="./app.js"></script>
+</body>
+</html> 
