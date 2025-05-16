@@ -22,6 +22,24 @@ function initApp() {
     document.getElementById('savePositions').addEventListener('click', handleSavePositions);
     document.getElementById('printCheque').addEventListener('click', handlePrintCheque);
     
+    // Set up page navigation
+    document.querySelectorAll('.nav-link[data-page]').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const pageId = this.getAttribute('data-page');
+            navigateToPage(pageId);
+        });
+    });
+
+    // Set up "Start Now" buttons
+    document.querySelectorAll('a[data-page]').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const pageId = this.getAttribute('data-page');
+            navigateToPage(pageId);
+        });
+    });
+    
     // Language switcher
     document.getElementById('languageSelector').value = currentLanguage;
     document.getElementById('languageSelector').addEventListener('change', handleLanguageChange);
@@ -1149,85 +1167,66 @@ function updateEditAmountPlaceholder() {
 }
 
 // Navigation and Page Management
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize pages
-    const pages = {
-        home: document.getElementById('homePage'),
-        about: document.getElementById('aboutPage'),
-        contact: document.getElementById('contactPage')
-    };
-
-    // Navigation handling
+function navigateToPage(pageId) {
+    // Hide all pages
+    document.querySelectorAll('.page-section').forEach(page => {
+        page.classList.remove('active');
+    });
+    
+    // Show selected page
+    const selectedPage = document.getElementById(pageId + 'Page');
+    if (selectedPage) {
+        selectedPage.classList.add('active');
+    }
+    
+    // Update navigation links
     document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetPage = this.getAttribute('data-page');
-            
-            // Hide all pages
-            Object.values(pages).forEach(page => {
-                if (page) page.style.display = 'none';
-            });
-            
-            // Show target page
-            if (pages[targetPage]) {
-                pages[targetPage].style.display = 'block';
+        link.classList.remove('active');
+        if (link.getAttribute('data-page') === pageId) {
+            link.classList.add('active');
+        }
+    });
+}
+
+// Export to Excel functionality
+document.getElementById('exportExcel').addEventListener('click', function() {
+    // Get all cheques from localStorage
+    const cheques = JSON.parse(localStorage.getItem('cheques')) || [];
+    
+    // Prepare data for Excel
+    const excelData = cheques.map(cheque => {
+        // Format amount as number string (e.g., 1000.55 or 1000.550)
+        let amount = '';
+        if (typeof cheque.amount_dinars !== 'undefined' && typeof cheque.amount_piasters !== 'undefined') {
+            // Determine if this is a 2-digit or 3-digit subunit currency
+            const filCurrencyCodes = ['JOD', 'BHD', 'IQD', 'KWD', 'AED', 'YER'];
+            if (filCurrencyCodes.includes(cheque.currency)) {
+                amount = `${cheque.amount_dinars}.${cheque.amount_piasters.toString().padStart(3, '0')}`;
+            } else {
+                amount = `${cheque.amount_dinars}.${cheque.amount_piasters.toString().padStart(2, '0')}`;
             }
-            
-            // Update active state in navigation
-            document.querySelectorAll('.nav-link').forEach(navLink => {
-                navLink.classList.remove('active');
-            });
-            this.classList.add('active');
-        });
+        }
+        return {
+            'Cheque Number': cheque.cheque_number || '',
+            'Recipient': cheque.recipient || '',
+            'Amount': amount,
+            'Currency': cheque.currency || '',
+            'Date': cheque.date || '',
+            'Bank Name': cheque.bank_name || '',
+            'Account Number': cheque.account_number || '',
+            'Status': cheque.status || '',
+            'Notes': cheque.notes || ''
+        };
     });
 
-    // Language handling for new content
-    function updateLanguageContent(lang) {
-        const translations = {
-            en: {
-                about_title: 'About Us',
-                about_content: 'Welcome to our Cheque Management System. We provide a comprehensive solution for managing and tracking cheques efficiently. Our system helps you organize, print, and monitor your cheques with ease.',
-                contact_title: 'Contact Us',
-                contact_email_label: 'Email us at:',
-                home: 'Home',
-                about: 'About',
-                contact: 'Contact'
-            },
-            ar: {
-                about_title: 'من نحن',
-                about_content: 'مرحباً بكم في نظام إدارة الشيكات. نحن نقدم حلاً شاملاً لإدارة وتتبع الشيكات بكفاءة. يساعدك نظامنا على تنظيم وطباعة ومراقبة شيكاتك بسهولة.',
-                contact_title: 'اتصل بنا',
-                contact_email_label: 'راسلنا على:',
-                home: 'الرئيسية',
-                about: 'من نحن',
-                contact: 'اتصل بنا'
-            }
-        };
+    // Create worksheet
+    const ws = XLSX.utils.json_to_sheet(excelData);
 
-        // Update navigation
-        document.querySelectorAll('[data-i18n]').forEach(element => {
-            const key = element.getAttribute('data-i18n');
-            if (translations[lang][key]) {
-                element.textContent = translations[lang][key];
-            }
-        });
+    // Create workbook
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Cheques");
 
-        // Update form placeholders
-        document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
-            const key = element.getAttribute('data-i18n-placeholder');
-            if (translations[lang][key]) {
-                element.placeholder = translations[lang][key];
-            }
-        });
-    }
-
-    // Initialize language
-    const languageSelector = document.getElementById('languageSelector');
-    if (languageSelector) {
-        languageSelector.addEventListener('change', function() {
-            updateLanguageContent(this.value);
-        });
-        // Initial language update
-        updateLanguageContent(languageSelector.value);
-    }
+    // Generate Excel file
+    const fileName = `Cheque_List_${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(wb, fileName);
 }); 
